@@ -1,54 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Frontend System Design Fundamentals</title>
-    <link rel="stylesheet" href="../../styles/index.css">
+    <link rel="stylesheet" href="../../styles/index.css" />
     <template id="card_template">
-        <article class="card">
-            <h3 class="card__title"></h3>
-            <div class="card__body">
-                <div class='card__body__image'></div>
-                <section class='card__body__content'>
-                </section>
-            </div>
-        </article>
+      <article class="card">
+        <h3 class="card__title"></h3>
+        <div class="card__body">
+          <div class="card__body__image"></div>
+          <section class="card__body__content"></section>
+        </div>
+      </article>
     </template>
-</head>
-<body>
-<main id="container">
-    <div id="list"></div>
-    <div id="bottom-observer">
-        Bottom Observer
-    </div>
-</main>
-<script type="module">
-    import {initMockDB} from "../../utils/db.js";
+  </head>
+  <body>
+    <main id="container">
+      <div id="list"></div>
+      <div id="bottom-observer">Bottom Observer</div>
+    </main>
+    <script type="module">
+      import { initMockDB } from "../../utils/db.js";
 
-    const [template, list, observerElement] = document.querySelectorAll("#card_template, #list, #bottom-observer");
+      const [template, list, observerElement] = document.querySelectorAll(
+        "#card_template, #list, #bottom-observer"
+      );
 
-    const db = initMockDB({
+      const db = initMockDB({
         title: "Fundamentals of Frontend System Design",
-        body: "Learning to use Intersection Observer"
-    });
+        body: "Learning to use Intersection Observer",
+      });
 
-    function createCardElement(title, body) {
+      function createCardElement(title, body) {
         const element = template.content.cloneNode(true).firstElementChild;
-        const [cardTitle, cardBody] = element.querySelectorAll('.card__title, .card__body__content');
+        const [cardTitle, cardBody] = element.querySelectorAll(
+          ".card__title, .card__body__content"
+        );
         [cardTitle.textContent, cardBody.textContent] = [title, body];
         return element;
-    }
+      }
 
-    /**
-     * Exercise - Intersection Observer
-     * 1. Create Intersection observer instance and provide a callback to it
-     * 2. In the callback use mock db - next function to get the next chunk of data
-     * 3. Create a fragment where you chunk all your DOM Mutations
-     * 4. Update fragment
-     * 5. Append fragment to "list" container
-     */
-    const observer = null;
-
-</script>
-</body>
+      /**
+       * Exercise - Intersection Observer
+       * 1. Create Intersection observer instance and provide a callback to it
+       * 2. In the callback use mock db - next function to get the next chunk of data
+       * 3. Create a fragment where you chunk all your DOM Mutations
+       * 4. Update fragment
+       * 5. Append fragment to "list" container
+       */
+      const options = {
+        root: null,
+        rootMargin: "0px",
+        scrollMargin: "0px",
+        threshold: 0.2,
+      };
+      let page = 0;
+      const callback = (entries,observer) => {
+        console.log(entries);
+        entries.forEach(async (entry) => {
+            if(entry.isIntersecting){
+                const fragment = document.createDocumentFragment();
+                const data = await db.getPage(page++);
+                data.forEach((item) => {
+                    const cardElement = createCardElement(item.title, item.body);
+                    fragment.appendChild(cardElement);
+                });
+                list.appendChild(fragment);
+            }
+        })
+      }
+      const observer = new IntersectionObserver(callback, options);
+      observer.observe(observerElement);
+    </script>
+  </body>
 </html>
