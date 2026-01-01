@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Virtualization</title>
-    <link rel="stylesheet" href="../../../styles/index.css">
-    <link rel="stylesheet" href="./virtualisation.css">
+    <link rel="stylesheet" href="../../../styles/index.css" />
+    <link rel="stylesheet" href="./virtualisation.css" />
     <template id="card_template">
-        <article class="card">
-            <h3 class="card__title"></h3>
-            <div class="card__body">
-                <div class='card__body__image'></div>
-                <section class='card__body__content' contenteditable="true">
-                </section>
-            </div>
-        </article>
+      <article class="card">
+        <h3 class="card__title"></h3>
+        <div class="card__body">
+          <div class="card__body__image"></div>
+          <section class="card__body__content" contenteditable="true"></section>
+        </div>
+      </article>
     </template>
-</head>
-<body>
-</body>
-<script type="module">
-    import {VirtualList} from "./virtual-list.js";
-    import {initMockDB} from "../../../utils/db.js";
+  </head>
+  <body></body>
+  <script type="module">
+    import { VirtualList } from "./virtual-list.js";
+    import { initMockDB } from "../../../utils/db.js";
     const container = document.body;
-    const template = document.getElementById('card_template')
-    const DB = initMockDB({title: 'Frontend System Design', body: 'Learning about virtualization'})
+    const template = document.getElementById("card_template");
+    const DB = initMockDB({
+      title: "Frontend System Design",
+      body: "Learning about virtualization",
+    });
 
     /**
      * @param datum {{ title: string, body: string}}
@@ -31,15 +32,22 @@
      * @returns {HTMLElement}
      */
     function createOrUpdateCard(datum, element) {
-        return null;
+      const card =
+        element ?? template.cloneNode(true).content.firstElementChild;
+      const [cardTitle, cardBody] = card.querySelectorAll(
+        ".card__title, .card__body__content"
+      );
+      cardTitle.textContent = datum.title;
+      cardBody.textContent = datum.body;
+      return card;
     }
 
     const list = new VirtualList(container, {
-        getPage: null,
-        getTemplate: null,
-        pageSize: null,
-        updateTemplate: null
+      getPage: (pageNo) => DB.getPage(pageNo),
+      getTemplate: createOrUpdateCard,
+      pageSize: 10,
+      updateTemplate: createOrUpdateCard,
     });
     list.render();
-</script>
+  </script>
 </html>

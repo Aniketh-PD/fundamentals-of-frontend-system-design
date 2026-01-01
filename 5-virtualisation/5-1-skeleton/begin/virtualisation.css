@@ -1,0 +1,8 @@
+.card {
+  /* creates a stacking context */
+  position: absolute;
+  width: 100%;
+}
+#container {
+  position: relative;
+}
